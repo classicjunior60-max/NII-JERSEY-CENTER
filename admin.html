@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nii Jersey Center — Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --pitch:#0d1f16;
+    --pitch2:#123422;
+    --gold:#e0b13c;
+    --gold-bright:#f4d06f;
+    --chalk:#f4f1e8;
+    --line:rgba(244,241,232,0.14);
+    --card:#122a1c;
+    --red:#c0392b;
+    --green:#2e9e5b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Archivo',sans-serif;
+    background:var(--pitch);
+    color:var(--chalk);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  header{
+    padding:20px;
+    border-bottom:1px solid var(--line);
+    background:rgba(13,31,22,0.92);
+  }
+  header h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:26px;
+    letter-spacing:1px;
+  }
+  header h1 span{ color:var(--gold); }
+
+  .tabs{
+    display:flex;
+    max-width:700px;
+    margin:16px auto 0;
+    padding:0 16px;
+    gap:8px;
+  }
+  .tab{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--line);
+    color:rgba(244,241,232,0.6);
+    padding:11px;
+    border-radius:6px;
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    cursor:pointer;
+  }
+  .tab.active{
+    background:var(--gold);
+    color:var(--pitch);
+    border-color:var(--gold);
+  }
+
+  main{
+    max-width:700px;
+    margin:0 auto;
+    padding:20px 16px;
+  }
+
+  form{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px;
+    margin-bottom:24px;
+  }
+  form h3{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:22px;
+    letter-spacing:0.5px;
+    margin-bottom:16px;
+  }
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block;
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:rgba(244,241,232,0.5);
+    margin-bottom:6px;
+  }
+  .field input{
+    width:100%;
+    background:#0a1810;
+    border:1px solid var(--line);
+    border-radius:5px;
+    padding:10px 12px;
+    color:var(--chalk);
+    font-size:14px;
+    font-family:inherit;
+  }
+  .field input:focus{ outline:none; border-color:var(--gold); }
+
+  .form-row{ display:flex; gap:10px; }
+  .form-row .field{ flex:1; }
+
+  .form-buttons{ display:flex; gap:8px; }
+  button[type="submit"]{
+    flex:1;
+    background:var(--gold);
+    color:var(--pitch);
+    border:none;
+    padding:12px;
+    border-radius:5px;
+    font-weight:800;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    cursor:pointer;
+  }
+  button[type="submit"]:hover{ background:var(--gold-bright); }
+  button[type="submit"]:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  #cancelEdit{
+    display:none;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--chalk);
+    padding:12px 18px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:13px;
+  }
+
+  .section-title{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:20px;
+    letter-spacing:0.5px;
+    color:rgba(244,241,232,0.7);
+    margin-bottom:12px;
+  }
+
+  .row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:10px;
+    margin-bottom:8px;
+  }
+  .row img{
+    width:50px; height:50px;
+    object-fit:cover;
+    border-radius:4px;
+    background:#fff;
+  }
+  .row-info{ flex:1; display:flex; flex-direction:column; gap:2px; }
+  .row-info strong{ font-size:14px; }
+  .row-info span{ font-size:12px; color:rgba(244,241,232,0.5); }
+
+  .row-actions{ display:flex; gap:6px; }
+  .row-actions button{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--chalk);
+    padding:6px 10px;
+    border-radius:5px;
+    font-size:11px;
+    cursor:pointer;
+    text-transform:uppercase;
+  }
+  .delete-btn{ color:#ff8a7a !important; border-color:rgba(192,57,43,0.4) !important; }
+
+  .muted{ color:rgba(244,241,232,0.5); font-size:13px; }
+  .small{ font-size:11px; }
+
+  .order-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px;
+    margin-bottom:10px;
+  }
+  .order-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:6px;
+  }
+  .order-code{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:18px;
+    letter-spacing:0.5px;
+    color:var(--gold-bright);
+  }
+  .status{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    padding:3px 9px;
+    border-radius:4px;
+    background:rgba(224,177,60,0.15);
+    color:var(--gold-bright);
+  }
+  .status.fulfilled{ background:rgba(46,158,91,0.15); color:#6fdb9a; }
+
+  .order-items{ margin:8px 0; font-size:13px; }
+  .order-items div{ display:flex; justify-content:space-between; padding:2px 0; }
+
+  .order-total{
+    display:flex; justify-content:space-between;
+    font-weight:700; font-size:15px;
+    border-top:1px solid var(--line);
+    padding-top:8px; margin-top:8px;
+    color:var(--gold-bright);
+  }
+
+  .order-actions{ margin-top:12px; }
+  .fulfill-btn{
+    background:var(--gold);
+    color:var(--pitch);
+    border:none;
+    padding:8px 14px;
+    border-radius:5px;
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+    text-transform:uppercase;
+  }
+  .fulfill-btn:disabled{
+    background:rgba(244,241,232,0.1);
+    color:rgba(244,241,232,0.4);
+    cursor:default;
+  }
+
+  #toast{
+    position:fixed;
+    bottom:-80px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--pitch2);
+    border:1px solid var(--gold);
+    color:var(--chalk);
+    padding:13px 20px;
+    border-radius:8px;
+    font-size:14px;
+    transition:bottom 0.3s ease;
+    z-index:100;
+  }
+  #toast.show{ bottom:24px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>NII JERSEY <span>ADMIN</span></h1>
+</header>
+
+<div class="tabs">
+  <button class="tab active" id="tabJerseys">Jerseys</button>
+  <button class="tab" id="tabOrders">Orders</button>
+</div>
+
+<main>
+  <div id="panelJerseys">
+    <form id="jerseyForm">
+      <h3 id="formTitle">Add a jersey</h3>
+      <div class="field">
+        <label for="name">Jersey Name</label>
+        <input type="text" id="name" required placeholder="e.g. Home Kit 2026">
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="team">Team</label>
+          <input type="text" id="team" required placeholder="e.g. Manchester United">
+        </div>
+        <div class="field">
+          <label for="kit">Kit Type</label>
+          <input type="text" id="kit" placeholder="e.g. Home Kit">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="tag">Tag / Colourway</label>
+          <input type="text" id="tag" placeholder="e.g. TeamViewer Red">
+        </div>
+        <div class="field">
+          <label for="price">Price (GH₵)</label>
+          <input type="number" id="price" required min="0" placeholder="150">
+        </div>
+      </div>
+      <div class="field">
+        <label for="image">Image URL</label>
+        <input type="url" id="image" placeholder="https://...">
+      </div>
+      <div class="form-buttons">
+        <button type="submit">Save Jersey</button>
+        <button type="button" id="cancelEdit">Cancel</button>
+      </div>
+    </form>
+
+    <div class="section-title">Current Jerseys</div>
+    <div id="jerseyList"></div>
+  </div>
+
+  <div id="panelOrders" style="display:none;">
+    <div class="section-title">Incoming Orders</div>
+    <div id="ordersList"></div>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBHKCdQVDbnO52rYLgBBNkkoZ7717XQbFw",
+    authDomain: "nii-jersey-center.firebaseapp.com",
+    projectId: "nii-jersey-center",
+    storageBucket: "nii-jersey-center.firebasestorage.app",
+    messagingSenderId: "839868977566",
+    appId: "1:839868977566:web:f259a090ab912718e5c68f",
+    measurementId: "G-Y46Y69K8NM"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const jerseyList = document.getElementById("jerseyList");
+  const jerseyForm = document.getElementById("jerseyForm");
+  const formTitle = document.getElementById("formTitle");
+  const cancelEditBtn = document.getElementById("cancelEdit");
+  const ordersList = document.getElementById("ordersList");
+  const toast = document.getElementById("toast");
+  const tabJerseys = document.getElementById("tabJerseys");
+  const tabOrders = document.getElementById("tabOrders");
+  const panelJerseys = document.getElementById("panelJerseys");
+  const panelOrders = document.getElementById("panelOrders");
+
+  let editingId = null;
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2800);
+  }
+
+  function money(n) {
+    const num = Number(n);
+    return "GH₵" + (isNaN(num) ? n : num.toLocaleString());
+  }
+
+  tabJerseys.addEventListener("click", () => switchTab("jerseys"));
+  tabOrders.addEventListener("click", () => switchTab("orders"));
+
+  function switchTab(tab) {
+    const isJerseys = tab === "jerseys";
+    tabJerseys.classList.toggle("active", isJerseys);
+    tabOrders.classList.toggle("active", !isJerseys);
+    panelJerseys.style.display = isJerseys ? "block" : "none";
+    panelOrders.style.display = isJerseys ? "none" : "block";
+    if (!isJerseys) loadOrders();
+  }
+
+  async function loadJerseys() {
+    jerseyList.innerHTML = `<p class="muted">Loading...</p>`;
+    try {
+      const snap = await getDocs(collection(db, "jerseys"));
+      const jerseys = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (jerseys.length === 0) {
+        jerseyList.innerHTML = `<p class="muted">No jerseys yet. Add your first one above.</p>`;
+        return;
+      }
+      jerseyList.innerHTML = "";
+      jerseys.forEach(j => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+          <img src="${j.image || 'https://placehold.co/60x60/122a1c/f4d06f?text=%E2%80%94'}" alt="">
+          <div class="row-info">
+            <strong>${j.name || "Untitled"}</strong>
+            <span>${j.team || ""} · ${j.kit || ""} · ${money(j.price)}</span>
+          </div>
+          <div class="row-actions">
+            <button class="edit-btn" data-id="${j.id}">Edit</button>
+            <button class="delete-btn" data-id="${j.id}">Delete</button>
+          </div>
+        `;
+        jerseyList.appendChild(row);
+      });
+
+      document.querySelectorAll(".edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const jersey = jerseys.find(x => x.id === btn.dataset.id);
+          startEdit(jersey);
+        });
+      });
+
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (!confirm("Delete this jersey? This can't be undone.")) return;
+          await deleteDoc(doc(db, "jerseys", btn.dataset.id));
+          showToast("Jersey deleted.");
+          loadJerseys();
+        });
+      });
+    } catch (err) {
+      console.error(err);
+      jerseyList.innerHTML = `<p class="muted">Couldn't load jerseys. Refresh to try again.</p>`;
+    }
+  }
+
+  function startEdit(jersey) {
+    editingId = jersey.id;
+    formTitle.textContent = "Edit jersey";
+    jerseyForm.name.value = jersey.name || "";
+    jerseyForm.team.value = jersey.team || "";
+    jerseyForm.kit.value = jersey.kit || "";
+    jerseyForm.tag.value = jersey.tag || "";
+    jerseyForm.price.value = jersey.price || "";
+    jerseyForm.image.value = jersey.image || "";
+    cancelEditBtn.style.display = "inline-block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function resetForm() {
+    editingId = null;
+    formTitle.textContent = "Add a jersey";
+    jerseyForm.reset();
+    cancelEditBtn.style.display = "none";
+  }
+
+  cancelEditBtn.addEventListener("click", resetForm);
+
+  jerseyForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = jerseyForm.querySelector("button[type=submit]");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Saving...";
+
+    const data = {
+      name: jerseyForm.name.value.trim(),
+      team: jerseyForm.team.value.trim(),
+      kit: jerseyForm.kit.value.trim(),
+      tag: jerseyForm.tag.value.trim(),
+      price: Number(jerseyForm.price.value),
+      image: jerseyForm.image.value.trim(),
+      updatedAt: serverTimestamp()
+    };
+
+    try {
+      if (editingId) {
+        await updateDoc(doc(db, "jerseys", editingId), data);
+        showToast("Jersey updated.");
+      } else {
+        data.createdAt = serverTimestamp();
+        await addDoc(collection(db, "jerseys"), data);
+        showToast("Jersey added.");
+      }
+      resetForm();
+      loadJerseys();
+    } catch (err) {
+      console.error(err);
+      showToast("Something went wrong saving this jersey.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Save Jersey";
+    }
+  });
+
+  async function loadOrders() {
+    ordersList.innerHTML = `<p class="muted">Loading...</p>`;
+    try {
+      const snap = await getDocs(collection(db, "orders"));
+      const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+      if (orders.length === 0) {
+        ordersList.innerHTML = `<p class="muted">No orders yet.</p>`;
+        return;
+      }
+      ordersList.innerHTML = "";
+      orders.forEach(o => {
+        const card = document.createElement("div");
+        card.className = "order-card";
+        const date = o.createdAt?.seconds
+          ? new Date(o.createdAt.seconds * 1000).toLocaleString()
+          : "Just now";
+        const itemsHtml = (o.items || []).map(it =>
+          `<div><span>${it.name} × ${it.qty}</span><span>${money(it.price * it.qty)}</span></div>`
+        ).join("");
+        card.innerHTML = `
+          <div class="order-head">
+            <span class="order-code">${o.code || o.id}</span>
+            <span class="status ${o.status || 'new'}">${o.status || "new"}</span>
+          </div>
+          <p><strong>${o.customerName}</strong> · ${o.phone}</p>
+          <p class="muted">${o.address}, ${o.city}, ${o.region}</p>
+          <div class="order-items">${itemsHtml}</div>
+          <div class="order-total"><span>Total</span><span>${money(o.total)}</span></div>
+          <p class="muted small" style="margin-top:6px;">${date}</p>
+          <div class="order-actions">
+            <button class="fulfill-btn" data-id="${o.id}" ${o.status === 'fulfilled' ? 'disabled' : ''}>
+              ${o.status === 'fulfilled' ? 'Fulfilled' : 'Mark fulfilled'}
+            </button>
+          </div>
+        `;
+        ordersList.appendChild(card);
+      });
+
+      document.querySelectorAll(".fulfill-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await updateDoc(doc(db, "orders", btn.dataset.id), { status: "fulfilled" });
+          loadOrders();
+        });
+      });
+    } catch (err) {
+      console.error(err);
+      ordersList.innerHTML = `<p class="muted">Couldn't load orders. Refresh to try again.</p>`;
+    }
+  }
+
+  loadJerseys();
+</script>
+
+</body>
+</html>
